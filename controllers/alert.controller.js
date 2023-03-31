@@ -1,13 +1,11 @@
-import Alerta from '../models/Alerta.model.js';
+import Alert from '../models/Alert.model.js';
 import User from '../models/User.model.js';
-
-
 
 const getAlerts = async (req,res) => {
   if(!req.user){
     res.send('loggin first');
   }else{
-    const alerts = await Alerta.find({});
+    const alerts = await Alert.find({});
     res.send(alerts);  
   }
 }
@@ -17,14 +15,14 @@ const getMyAlerts = async (req,res) =>{
     res.send('loggin first');
   }else{
     const alerts = await Promise.all(req.user.alerts.map(alertId => {
-      return Alerta.find({_id:alertId});
+      return Alert.find({_id:alertId});
     }));
     await User.updateOne({_id:req.user._id},{alerts: []});
     res.send(alerts);
   }
 }
 const postAlert = async (req,res) => {
-  const alerta = new Alerta ({
+  const alerta = new Alert ({
   title: req.body.title,
   body: req.body.body,
   icon: req.body.icon
