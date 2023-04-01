@@ -5,11 +5,12 @@ import bodyParser from "body-parser";
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import { getAlerts, getMyAlerts, postAlert } from "./controllers/alert.controller.js";
-import { getUser, getUsers, postUser } from "./controllers/user.controller.js";
+import { getCurrentUser, getUser, getUsers, postUser } from "./controllers/user.controller.js";
 import session from 'express-session';
 import passport from 'passport';
 import User from "./models/User.model.js";
 import { getLogout, postLogin, postRegister } from "./controllers/login.controller.js";
+import { getMyGroup, getMyGroups, postGroup, postJoinGroup } from "./controllers/group.controller.js";
 
 const options = {
   definition: {
@@ -59,19 +60,26 @@ app.use(bodyParser.urlencoded({extended:true}));
 
 app.get('/error', function(req,res){res.send('error de login');});
 
+app.get('/currentUser', getCurrentUser);
+app.post('/login', postLogin);
+app.post('/register', postRegister);
+app.get('/logout', getLogout);
+
+app.post('/groups/new', postGroup);
+app.post('/groups/join',postJoinGroup);
+app.get('/groups/myGroups', getMyGroups);
+
+app.get('/groups/myGroup/:id', getMyGroup);
+
+
+app.get('/users', getUsers);
+app.post('/user', postUser);
+app.get('/user/:id', getUser);
 
 
 app.get('/alerts',getAlerts);
 app.post('/alert', postAlert);
 app.get('/myAlerts', getMyAlerts);
-
-app.get('/users', getUsers);
-app.post('/user', postUser);
-app.get('/user/:id', getUser);
-app.post('/login', postLogin);
-app.post('/register', postRegister);
-
-app.get('/logout', getLogout);
 
 
 app.listen(4000, function(){

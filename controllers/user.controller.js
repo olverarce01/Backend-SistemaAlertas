@@ -19,4 +19,12 @@ const getUser = async (req, res) => {
   res.send(user);
 }
 
-export {getUsers, postUser, getUser};
+const getCurrentUser = (req, res) => {
+  if(req.user){
+    res.send(req.user);
+  }else{
+    res.send('none user still');
+  }
+}
+
+export {getUsers, postUser, getUser, getCurrentUser};

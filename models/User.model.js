@@ -3,7 +3,8 @@ import passportLocalMongoose from 'passport-local-mongoose';
 
 const userSchema = mongoose.Schema({
   username: String,
-  nickname: String,
+  name: String,
+  address: String,
   password: String,
   alerts: {
     type: [mongoose.Schema.Types.ObjectId],
