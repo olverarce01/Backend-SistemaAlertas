@@ -62,22 +62,24 @@ app.get('/error', function(req,res){res.send('error de login');});
 
 app.get('/currentUser', getCurrentUser);
 app.post('/login', postLogin);
-app.post('/register', postRegister); //verificar usuarios duplicados
+app.post('/register', postRegister);
 app.get('/logout', getLogout);
 
-app.post('/groups/new', postGroup); //verificar grupos duplicados
+
+app.post('/groups/new', postGroup);
 app.post('/groups/join',postJoinGroup); //verificar duplicacion de usergroup con group y user iguales
 app.get('/groups/myGroups', getMyGroups); 
 app.get('/groups/myGroup/:id', getMyGroup);
+app.get('/user/:id', getUser);
+
+
 app.post('/groups/blockUser', postBlockUserInGroup); //agregar restriccion solo admin
 app.post('/groups/delete', postDeleteGroup); //agregar restriccion solo admin
 app.post('/groups/rename', postRenameGroup); //agregar restriccion solo admin
-
-app.get('/user/:id', getUser);
 //admin dar permisos a otros
 
-app.post('/alerts/new', postAlert); // revisar
-app.get('/alerts/myGroup/:id', getMyAlertsInGroup);// revisar
+app.post('/alerts/new', postAlert);
+app.get('/alerts/myGroup/:id', getMyAlertsInGroup);
 
 
 app.listen(4000, function(){

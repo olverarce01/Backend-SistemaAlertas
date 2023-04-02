@@ -6,8 +6,9 @@ const postRegister = (req, res) => {
   const {username, password, address, name} = req.body;
 
   User.register({username: username, address: address, name:name}, password,function(err, user){
-    if(err){console.log(err)} else
-      res.send('registered');
+    if(err){res.send(err)}
+    else
+    {res.send('registered');}
   });
   
 }

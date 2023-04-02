@@ -3,6 +3,7 @@ import AlertInGroup from '../models/AlertInGroup.js';
 import Group from '../models/Group.model.js';
 import User from '../models/User.model.js';
 import UserGroup from '../models/UserGroup.model.js';
+import mongoose from 'mongoose';
 
 const getMyAlertsInGroup = async (req,res) =>{
   if(!req.user){
@@ -10,8 +11,7 @@ const getMyAlertsInGroup = async (req,res) =>{
   }else{
     const idGroup = new mongoose.Types.ObjectId(req.params.id);
 
-    const group = Group.findOne({_id: idGroup});
-    const AlertsInGroup = AlertInGroup.aggregate(
+    const AlertsInGroup = await AlertInGroup.aggregate(
     [
       {$match: {group: idGroup}},
       {
@@ -26,16 +26,21 @@ const getMyAlertsInGroup = async (req,res) =>{
       {$unwind: '$dataAlert'}
     ]
     )
-    const results = await Promise.all([group, AlertsInGroup]);
-
-    const data = {
-      "group": results[0],
-      "alerts": await Promise.all(results[1].map(async(alertsInGroup)=>{
-        const sender = User.findOne({_id: alertsInGroup.dataAlert.user})
-        return {...alertsInGroup, sender};
+    if(AlertsInGroup){
+      const result = await Promise.all(AlertsInGroup.map(async(alert)=>{
+        const sender = await User.findOne({_id:alert.dataAlert.sender});
+        return {
+          sender,
+          "_id ":alert._id,
+          "alert":alert.alert,
+          "createdAt":alert.dataAlert.createdAt,
+          "updatedAt":alert.dataAlert.updatedAt
+        };
       }))
+      res.send(result);
+    }else{
+      res.send('not found alerts in group')
     }
-    res.send(data);
   }
 }
 
@@ -55,11 +60,25 @@ const postAlert = async (req,res) => {
       });
       alertInGroup.save()   
       //conectar con firebase realtime     
+      /*
+      const integrants = await UserGroup.find({group: userGroup._id})
+      integrants.foreach(integrant =>{
+        const obj = {
+          "user": integrant.user
+        }
+        database.ref("alertar").set(obj, function(error){
+          if(error){
+            console.log("Failed with error: "+ error)
+          }else{
+            console.log("success")
+          }
+        })
+      })
+      */
     });
     
-    if(result){
-      res.send('alerta guardada');
-    }
+    res.send('alerta guardada');
+    
     
   }else{
     res.send('user not logged still')

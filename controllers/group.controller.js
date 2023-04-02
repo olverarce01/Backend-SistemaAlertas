@@ -8,18 +8,22 @@ const postGroup = async (req,res) =>{
   const group = new Group({
     groupName: groupName
   });
-  const result = await group.save();
-  if(result){
-    const userGroup = new UserGroup({
-      user: req.user._id,
-      group: group._id,
-      admin: true
-    });
-    userGroup.save();
-  
-    res.send('group saved');      
-  }else{
-    res.send('group no saved');
+  try{
+    const result = await group.save();
+    if(result){
+      const userGroup = new UserGroup({
+        user: req.user._id,
+        group: group._id,
+        admin: true
+      });
+      userGroup.save();
+    
+      res.send('group saved');      
+    }else{
+      res.send('group no saved');
+    }
+  } catch(err){
+    res.send(err);
   }
 }
 
@@ -30,6 +34,7 @@ const postJoinGroup = async (req, res) => {
     const {code} = req.body;
     const group = await Group.findOne({_id:code});
     if(group){
+      
       const userGroup = new UserGroup({
         user: req.user._id,
         group: group._id,
@@ -51,7 +56,6 @@ const getNumIntegrants = async (id) =>{
       { $count : "integrants"},
     ]
     );
-  console.log(result[0].integrants);
   return result[0].integrants;
 }
 
