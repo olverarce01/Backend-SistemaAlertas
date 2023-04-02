@@ -51,11 +51,11 @@ const postAlert = async (req,res) => {
     });
     alert.save();
 
-    const myGroups = await UserGroup.find({user: req.user._id});
+    const myGroups = await UserGroup.find({user: req.user._id, blocked: false});
 
     myGroups.forEach(userGroup => {
       let alertInGroup = new AlertInGroup({
-        group: userGroup._id,
+        group: userGroup.group,
         alert: alert._id
       });
       alertInGroup.save()   

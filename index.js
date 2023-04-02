@@ -1,3 +1,6 @@
+import * as dotenv from 'dotenv'
+dotenv.config()
+
 import mongoose from "mongoose";
 import express from "express";
 import cors from 'cors';
@@ -10,7 +13,7 @@ import session from 'express-session';
 import passport from 'passport';
 import User from "./models/User.model.js";
 import { getLogout, postLogin, postRegister } from "./controllers/login.controller.js";
-import { getMyGroup, getMyGroups, postBlockUserInGroup, postDeleteGroup, postGroup, postJoinGroup, postRenameGroup } from "./controllers/group.controller.js";
+import { getMyGroup, getMyGroups, postBlockUserInGroup, postDeleteGroup, postGroup, postJoinGroup, postRenameGroup, postSetAdmin } from "./controllers/group.controller.js";
 
 const options = {
   definition: {
@@ -42,7 +45,8 @@ app.use(
 );
 
 mongoose.set('strictQuery',false);
-mongoose.connect('mongodb://localhost:27017/alertaDB',{useNewUrlParser:true});
+//mongoose.connect('mongodb://localhost:27017/alertaDB',{useNewUrlParser:true});
+mongoose.connect(process.env.MONGODB,{useNewUrlParser:true});
 
 passport.use(User.createStrategy());
 passport.serializeUser(User.serializeUser());
@@ -67,21 +71,21 @@ app.get('/logout', getLogout);
 
 
 app.post('/groups/new', postGroup);
-app.post('/groups/join',postJoinGroup); //verificar duplicacion de usergroup con group y user iguales
-app.get('/groups/myGroups', getMyGroups); 
+app.post('/groups/join',postJoinGroup);
+app.get('/groups/myGroups', getMyGroups);
 app.get('/groups/myGroup/:id', getMyGroup);
 app.get('/user/:id', getUser);
 
 
-app.post('/groups/blockUser', postBlockUserInGroup); //agregar restriccion solo admin
-app.post('/groups/delete', postDeleteGroup); //agregar restriccion solo admin
-app.post('/groups/rename', postRenameGroup); //agregar restriccion solo admin
-//admin dar permisos a otros
+app.post('/groups/blockUser', postBlockUserInGroup);
+app.post('/groups/delete', postDeleteGroup);
+app.post('/groups/rename', postRenameGroup);
+app.post('/groups/setAdmin', postSetAdmin);
 
 app.post('/alerts/new', postAlert);
 app.get('/alerts/myGroup/:id', getMyAlertsInGroup);
 
-
-app.listen(4000, function(){
-  console.log('running server on port 4000');
+const port = process.env.PORT || 4000;
+app.listen(port, function(){
+  console.log('running server on port '+port);
 });

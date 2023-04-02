@@ -32,17 +32,23 @@ const postJoinGroup = async (req, res) => {
     res.send('loggin first');
   }else{
     const {code} = req.body;
-    const group = await Group.findOne({_id:code});
+    const group = await Promise.resolve(Group.findOne({_id:code}));
+
     if(group){
+      const findUserGroup = await UserGroup.findOne({user: req.user._id, group: group._id});
       
-      const userGroup = new UserGroup({
-        user: req.user._id,
-        group: group._id,
-        admin: false
-      });
-      userGroup.save();
-    
-      res.send('user added');      
+      if(!findUserGroup){
+        const userGroup = new UserGroup({
+          user: req.user._id,
+          group: group._id,
+          admin: false
+        });
+        userGroup.save();    
+        res.send('user added');        
+      }else{
+        res.send('you are already in the group')
+      }
+      
     }else{
       res.send('not found group');
     }  
@@ -52,7 +58,7 @@ const postJoinGroup = async (req, res) => {
 const getNumIntegrants = async (id) =>{
   const result = await UserGroup.aggregate(
     [
-      { $match : { group : id } },
+      { $match : { group : id, blocked: false} },
       { $count : "integrants"},
     ]
     );
@@ -65,7 +71,7 @@ const getMyGroups = async (req, res) => {
   }else{
     const result = await UserGroup.aggregate(
       [
-        { $match : { user : req.user._id } },
+        { $match : { user : req.user._id, blocked: false } },
         {
           $lookup:
           {
@@ -126,36 +132,89 @@ const getMyGroup = async (req, res) => {
 }
 
 const postDeleteGroup = async (req,res) =>{
-  const id = req.body.id;
-  const deleteGroup = Group.deleteOne({_id: id})
-  const deleteUserGroup = UserGroup.deleteMany({group: id});
-  const deleteAlertGroup = AlertInGroup.deleteMany({group: id});
-  const results = await Promise.all([deleteGroup,deleteUserGroup,deleteAlertGroup])
-  if(results[0] && results[1] && results[2]){
-    res.send('deleted group')
+  if(req.user){
+    const id = req.body.id;
+
+    const userGroup = await Promise.resolve(UserGroup.findOne({user: req.user._id, group: id}));
+    if(userGroup && userGroup.admin == true){
+      const deleteGroup = Group.deleteOne({_id: id})
+      const deleteUserGroup = UserGroup.deleteMany({group: id});
+      const deleteAlertGroup = AlertInGroup.deleteMany({group: id});
+      const results = await Promise.all([deleteGroup,deleteUserGroup,deleteAlertGroup])
+      if(results[0] && results[1] && results[2]){
+        res.send('deleted group')
+      }else{
+        res.send('no deleted group');
+      }
+    }
+    else{
+      res.send('you are not admin');
+    }
+  
   }else{
-    res.send('no deleted group');
+    res.send('first loggin');
   }
 }
 
 const postRenameGroup = async (req, res) =>{
-  const {id, newname} = req.body;
-  const result = await Group.updateOne({_id: id},{groupName: newname});
-  if(result){
-    res.send('updated name')
+
+  if(req.user){
+    const {id, newname} = req.body;
+
+    const userGroup = await Promise.resolve(UserGroup.findOne({user: req.user._id, group: id}));
+    if(userGroup && userGroup.admin == true){
+      const result = await Group.updateOne({_id: id},{groupName: newname});
+      if(result){
+        res.send('updated name')
+      }else{
+        res.send('no updated name')
+      }
+    }else{
+      res.send('you are not admin');
+    }
   }else{
-    res.send('no updated name')
+    res.send('first loggin')
   }
 }
 
 const postBlockUserInGroup = async (req, res) => {
-  const {user, group} = req.body;
-  const result = await UserGroup.updateOne({user: user, group: group},{blocked: true});
-  if(result){
-    res.send('blocked user in this group');
+
+  if(req.user){
+    const {user, group} = req.body;
+    const userGroup = await Promise.resolve(UserGroup.findOne({user: req.user._id, group: group}));
+    if(userGroup && userGroup.admin == true){
+      const result = await UserGroup.updateOne({user: user, group: group},{blocked: true, admin: false});
+      if(result){
+        res.send('blocked user in this group');
+      }else{
+        res.send('not blocked user in this group');
+      }    
+    }else{
+      res.send('you are not admin');
+    }
   }else{
-    res.send('not blocked user in this group');
+    res.send('first loggin');
   }
+
 }
 
-export {postGroup, postJoinGroup, getMyGroups, getMyGroup, postDeleteGroup, postRenameGroup, postBlockUserInGroup};
+const postSetAdmin = async(req, res) => {
+  if(req.user){
+    const {user, group} = req.body;
+    const userGroup = await Promise.resolve(UserGroup.findOne({user: req.user._id, group: group}));
+    if(userGroup && userGroup.admin == true){
+      const result = await UserGroup.updateOne({user: user, group: group},{admin: true});
+      if(result){
+        res.send('user is admin now');
+      }else{
+        res.send('user is not admin still');
+      }
+    }else{
+      res.send('you are not admin');
+    }
+  } else{
+    res.send('first loggin');
+  } 
+}
+
+export {postGroup, postJoinGroup, getMyGroups, getMyGroup, postDeleteGroup, postRenameGroup, postBlockUserInGroup, postSetAdmin};
