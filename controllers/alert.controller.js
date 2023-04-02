@@ -1,38 +1,69 @@
 import Alert from '../models/Alert.model.js';
+import AlertInGroup from '../models/AlertInGroup.js';
+import Group from '../models/Group.model.js';
 import User from '../models/User.model.js';
+import UserGroup from '../models/UserGroup.model.js';
 
-const getAlerts = async (req,res) => {
+const getMyAlertsInGroup = async (req,res) =>{
   if(!req.user){
     res.send('loggin first');
   }else{
-    const alerts = await Alert.find({});
-    res.send(alerts);  
+    const idGroup = new mongoose.Types.ObjectId(req.params.id);
+
+    const group = Group.findOne({_id: idGroup});
+    const AlertsInGroup = AlertInGroup.aggregate(
+    [
+      {$match: {group: idGroup}},
+      {
+        $lookup:
+        {
+          from: 'alerts',
+          localField: 'alert',
+          foreignField: '_id',
+          as: 'dataAlert'
+        }
+      },        
+      {$unwind: '$dataAlert'}
+    ]
+    )
+    const results = await Promise.all([group, AlertsInGroup]);
+
+    const data = {
+      "group": results[0],
+      "alerts": await Promise.all(results[1].map(async(alertsInGroup)=>{
+        const sender = User.findOne({_id: alertsInGroup.dataAlert.user})
+        return {...alertsInGroup, sender};
+      }))
+    }
+    res.send(data);
   }
 }
 
-const getMyAlerts = async (req,res) =>{
-  if(!req.user){
-    res.send('loggin first');
-  }else{
-    const alerts = await Promise.all(req.user.alerts.map(alertId => {
-      return Alert.find({_id:alertId});
-    }));
-    await User.updateOne({_id:req.user._id},{alerts: []});
-    res.send(alerts);
-  }
-}
 const postAlert = async (req,res) => {
-  const alerta = new Alert ({
-  title: req.body.title,
-  body: req.body.body,
-  icon: req.body.icon
-  });
-  alerta.save();
+  if(req.user){
+    const alert = new Alert ({
+      sender: req.user._id,
+    });
+    alert.save();
 
-  const result = await User.updateMany({},{$push: {alerts: alerta}})
-  if(result){
-    res.send('alerta guardada');
+    const myGroups = await UserGroup.find({user: req.user._id});
+
+    myGroups.forEach(userGroup => {
+      let alertInGroup = new AlertInGroup({
+        group: userGroup._id,
+        alert: alert._id
+      });
+      alertInGroup.save()   
+      //conectar con firebase realtime     
+    });
+    
+    if(result){
+      res.send('alerta guardada');
+    }
+    
+  }else{
+    res.send('user not logged still')
   }
 }
 
-export {getAlerts, postAlert, getMyAlerts};
+export {postAlert, getMyAlertsInGroup};

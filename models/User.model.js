@@ -6,10 +6,6 @@ const userSchema = mongoose.Schema({
   name: String,
   address: String,
   password: String,
-  alerts: {
-    type: [mongoose.Schema.Types.ObjectId],
-    ref: 'Alert'
-  }
 });
 userSchema.plugin(passportLocalMongoose);
 const User = mongoose.model('User',userSchema);

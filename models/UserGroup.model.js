@@ -9,7 +9,14 @@ const userGroupSchema = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Group'
   },
-  admin: Boolean
+  admin: {
+    type: Boolean,
+    default: false
+  },
+  blocked: {
+    type: Boolean,
+    default: false
+  }
   
 });
 const UserGroup = mongoose.model('UserGroup',userGroupSchema);

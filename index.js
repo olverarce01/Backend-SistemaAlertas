@@ -4,13 +4,13 @@ import cors from 'cors';
 import bodyParser from "body-parser";
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
-import { getAlerts, getMyAlerts, postAlert } from "./controllers/alert.controller.js";
-import { getCurrentUser, getUser, getUsers, postUser } from "./controllers/user.controller.js";
+import {getMyAlertsInGroup, postAlert } from "./controllers/alert.controller.js";
+import { getCurrentUser, getUser} from "./controllers/user.controller.js";
 import session from 'express-session';
 import passport from 'passport';
 import User from "./models/User.model.js";
 import { getLogout, postLogin, postRegister } from "./controllers/login.controller.js";
-import { getMyGroup, getMyGroups, postGroup, postJoinGroup } from "./controllers/group.controller.js";
+import { getMyGroup, getMyGroups, postBlockUserInGroup, postDeleteGroup, postGroup, postJoinGroup, postRenameGroup } from "./controllers/group.controller.js";
 
 const options = {
   definition: {
@@ -62,24 +62,22 @@ app.get('/error', function(req,res){res.send('error de login');});
 
 app.get('/currentUser', getCurrentUser);
 app.post('/login', postLogin);
-app.post('/register', postRegister);
+app.post('/register', postRegister); //verificar usuarios duplicados
 app.get('/logout', getLogout);
 
-app.post('/groups/new', postGroup);
-app.post('/groups/join',postJoinGroup);
-app.get('/groups/myGroups', getMyGroups);
-
+app.post('/groups/new', postGroup); //verificar grupos duplicados
+app.post('/groups/join',postJoinGroup); //verificar duplicacion de usergroup con group y user iguales
+app.get('/groups/myGroups', getMyGroups); 
 app.get('/groups/myGroup/:id', getMyGroup);
+app.post('/groups/blockUser', postBlockUserInGroup); //agregar restriccion solo admin
+app.post('/groups/delete', postDeleteGroup); //agregar restriccion solo admin
+app.post('/groups/rename', postRenameGroup); //agregar restriccion solo admin
 
-
-app.get('/users', getUsers);
-app.post('/user', postUser);
 app.get('/user/:id', getUser);
+//admin dar permisos a otros
 
-
-app.get('/alerts',getAlerts);
-app.post('/alert', postAlert);
-app.get('/myAlerts', getMyAlerts);
+app.post('/alerts/new', postAlert); // revisar
+app.get('/alerts/myGroup/:id', getMyAlertsInGroup);// revisar
 
 
 app.listen(4000, function(){
