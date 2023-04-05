@@ -16,6 +16,7 @@ import passport from 'passport';
 import User from "./models/User.model.js";
 import { getLogout, postLogin, postRegister } from "./controllers/login.controller.js";
 import { getMyGroup, getMyGroups, postBlockUserInGroup, postDeleteGroup, postGroup, postJoinGroup, postRenameGroup, postSetAdmin } from "./controllers/group.controller.js";
+import Suscription from './models/Suscription.model.js';
 
 const options = {
   definition: {
@@ -70,17 +71,13 @@ webpush.setVapidDetails("mailto:test@test.com", process.env.PUBLICKEY, process.e
 app.get('/', function(req,res){res.render('index')})
 
 app.post('/subscription', async (req, res) => {
-  
   let pushSubscription = req.body;
-  res.status(200).json();
-  const payload = JSON.stringify({
-    title: 'My custom notification',
-    body: 'Hello world',
-  });
-  try{
-    await webpush.sendNotification(pushSubscription,payload);
-  }catch(error){
-    console.log(error);
+  const result = await Suscription.findOne({keys: pushSubscription.keys});
+  if(result){
+    console.log('ya estabas suscrito')
+  }else{
+    let suscription = new Suscription(pushSubscription);  
+    await suscription.save();    
   }
 })
 

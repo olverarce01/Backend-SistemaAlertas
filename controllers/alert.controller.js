@@ -1,6 +1,7 @@
 import Alert from '../models/Alert.model.js';
 import AlertInGroup from '../models/AlertInGroup.js';
 import Group from '../models/Group.model.js';
+import Suscription from '../models/Suscription.model.js';
 import User from '../models/User.model.js';
 import UserGroup from '../models/UserGroup.model.js';
 import mongoose from 'mongoose';
@@ -51,38 +52,33 @@ const postAlert = async (req,res) => {
     });
     alert.save();
 
-    const myGroups = await UserGroup.find({user: req.user._id, blocked: false});
+    const myGroups = await Promise.resolve(UserGroup.find({user: req.user._id, blocked: false}));
 
-    myGroups.forEach(userGroup => {
+    Promise.all(myGroups.map(async (userGroup) => {
       let alertInGroup = new AlertInGroup({
         group: userGroup.group,
         alert: alert._id
       });
-      alertInGroup.save()   
-      //conectar con firebase realtime     
-      /*
-      const integrants = await UserGroup.find({group: userGroup._id})
-      integrants.foreach(integrant =>{
-        const obj = {
-          "user": integrant.user
-        }
-        database.ref("alertar").set(obj, function(error){
-          if(error){
-            console.log("Failed with error: "+ error)
-          }else{
-            console.log("success")
-          }
+      alertInGroup.save()
+
+      res.status(200).json();
+      const pushSubscription = await Promise.resolve(Suscription.find({}));
+      if(pushSubscription){
+        pushSubscription.forEach(suscription=>{
+          const payload = JSON.stringify({
+            title: 'My custom notification',
+            body: 'Hello world',
+          });
+          try{
+            Promise.resolve(webpush.sendNotification(suscription,payload));
+          }catch(error){
+            console.log(error);
+          }    
         })
-      })
-      */
-    });
+      }
+    }));
     
-    res.send('alerta guardada');
-    const subscription = req.body;
-    res.status(201).json({});
-    const payload = JSON.stringify({ title: "Hello World", body: "This is your first push notification" });
-    webpush.sendNotification(subscription, payload).catch(console.log);  
-    
+    res.send('alerta guardada');    
   }else{
     res.send('user not logged still')
   }
