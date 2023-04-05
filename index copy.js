@@ -56,28 +56,23 @@ passport.deserializeUser(User.deserializeUser());
 
 
 app.use(cors());
-//app.use(bodyParser.urlencoded({extended:true}));
-app.use(express.json());
+app.use(bodyParser.urlencoded({extended:true}));
 
 app.use(express.static('public'));
 app.set('view engine', 'ejs');
 
 webpush.setVapidDetails("mailto:test@test.com", process.env.PUBLICKEY, process.env.PRIVATEKEY);
+
 app.get('/', function(req,res){res.render('index')})
 
-app.post('/subscription', async (req, res) => {
+app.post('/subscribe', (req, res) => {
   
-  let pushSubscription = req.body;
-  res.status(200).json();
-  const payload = JSON.stringify({
-    title: 'My custom notification',
-    body: 'Hello world',
-  });
-  try{
-    await webpush.sendNotification(pushSubscription,payload);
-  }catch(error){
-    console.log(error);
-  }
+  const subscription = req.body;
+  console.log('in subscribe')
+  res.status(201).json({});
+  const payload = JSON.stringify({ title: "Hello World", body: "This is your first push notification" });
+
+  webpush.sendNotification(subscription, payload).catch(console.log);
 })
 
 app.get('/error', function(req,res){res.send('error de login');});

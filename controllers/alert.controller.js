@@ -78,7 +78,10 @@ const postAlert = async (req,res) => {
     });
     
     res.send('alerta guardada');
-    
+    const subscription = req.body;
+    res.status(201).json({});
+    const payload = JSON.stringify({ title: "Hello World", body: "This is your first push notification" });
+    webpush.sendNotification(subscription, payload).catch(console.log);  
     
   }else{
     res.send('user not logged still')
