@@ -5,7 +5,7 @@ self.addEventListener('push', function(e) {
     body: data.body,
     vibrate: [200, 100, 200, 100, 200, 100, 200],
     tag: "vibration-sample",
-    icon: window.location.origin+"./warning.png"
+    icon: "/warning.png"
   };
   const title = data.title;
   self.registration.showNotification(title,options);

@@ -63,6 +63,7 @@ app.use(express.static('public'));
 app.set('view engine', 'ejs');
 
 webpush.setVapidDetails("mailto:test@test.com", process.env.PUBLICKEY, process.env.PRIVATEKEY);
+
 app.get('/', function(req,res){res.render('index')})
 
 app.post('/subscription', async (req, res) => {
