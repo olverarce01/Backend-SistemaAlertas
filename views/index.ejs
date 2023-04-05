@@ -27,7 +27,7 @@
         };
 
         // Petición HTTP
-        fetch("https://backend-sistemaalertas-production.up.railway.app/login", options)
+        fetch("http://localhost:4000/login", options)
         .then(response => response.text())
         .then(data => {
             console.log(data);
@@ -44,7 +44,7 @@
             };
     
             // Petición HTTP
-            fetch("https://backend-sistemaalertas-production.up.railway.app/alerts/new", options2)
+            fetch("http://localhost:4000/alerts/new", options2)
             .then(response => response.text())
             .then(data => {
                 console.log(data);

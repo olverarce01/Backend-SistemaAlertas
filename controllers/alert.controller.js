@@ -5,6 +5,7 @@ import Suscription from '../models/Suscription.model.js';
 import User from '../models/User.model.js';
 import UserGroup from '../models/UserGroup.model.js';
 import mongoose from 'mongoose';
+import webpush from 'web-push';
 
 const getMyAlertsInGroup = async (req,res) =>{
   if(!req.user){
@@ -60,23 +61,24 @@ const postAlert = async (req,res) => {
         alert: alert._id
       });
       alertInGroup.save()
-
-      res.status(200).json();
-      const pushSubscription = await Promise.resolve(Suscription.find({}));
-      if(pushSubscription){
-        pushSubscription.forEach(suscription=>{
-          const payload = JSON.stringify({
-            title: 'My custom notification',
-            body: 'Hello world',
-          });
-          try{
-            Promise.resolve(webpush.sendNotification(suscription,payload));
-          }catch(error){
-            console.log(error);
-          }    
-        })
-      }
     }));
+
+    const pushSubscription = await Promise.resolve(Suscription.find({}));
+    if(pushSubscription){
+      pushSubscription.forEach(suscription=>{
+        const payload = JSON.stringify({
+          sender: req.user._id,
+          title: 'Alerta de emergencia',
+          body: 'usuario: '+alert.sender+' fecha: '+alert.createdAt,
+          groups: myGroups
+        });
+        try{
+          Promise.resolve(webpush.sendNotification(suscription,payload));
+        }catch(error){
+          console.log(error);
+        }    
+      })
+    }
     
     res.send('alerta guardada');    
   }else{
