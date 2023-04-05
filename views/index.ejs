@@ -8,6 +8,28 @@
 </head>
 <body>
     <h1>Push Notification Using Web-Push</h1>
+    <h1 id="user"></h1>
     <script src="./client.js"></script>
+    <script>
+        let data ={
+            "username": "olverarce01@gmail.com",
+            "password": "12345"
+        }
+        const options = {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+        };
+
+        // Petición HTTP
+        fetch("https://backend-sistemaalertas-production.up.railway.app/login", options)
+        .then(response => response.text())
+        .then(data => {
+            console.log(data);
+            document.getElementById("user").textContent=data;
+        });
+    </script>
 </body>
 </html>
