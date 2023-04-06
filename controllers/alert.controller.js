@@ -1,11 +1,20 @@
+import { ref, set } from 'firebase/database';
+import database from '../firebase.js';
 import Alert from '../models/Alert.model.js';
 import AlertInGroup from '../models/AlertInGroup.js';
 import Group from '../models/Group.model.js';
-import Suscription from '../models/Suscription.model.js';
 import User from '../models/User.model.js';
 import UserGroup from '../models/UserGroup.model.js';
 import mongoose from 'mongoose';
-import webpush from 'web-push';
+
+const getMyAlerts = async (req,res)=>{
+  if(!req.user){
+    res.send('loggin first')
+  }else{
+    const alerts = await Alert.find({});
+    res.send(alerts);
+  }
+};
 
 const getMyAlertsInGroup = async (req,res) =>{
   if(!req.user){
@@ -51,39 +60,41 @@ const postAlert = async (req,res) => {
     const alert = new Alert ({
       sender: req.user._id,
     });
-    alert.save();
-
-    const myGroups = await Promise.resolve(UserGroup.find({user: req.user._id, blocked: false}));
-
-    Promise.all(myGroups.map(async (userGroup) => {
-      let alertInGroup = new AlertInGroup({
-        group: userGroup.group,
-        alert: alert._id
-      });
-      alertInGroup.save()
-    }));
-
-    const pushSubscription = await Promise.resolve(Suscription.find({}));
-    if(pushSubscription){
-      pushSubscription.forEach(suscription=>{
-        const payload = JSON.stringify({
-          sender: req.user._id,
-          title: 'Alerta de emergencia',
-          body: 'usuario: '+alert.sender+' fecha: '+alert.createdAt,
-          groups: myGroups
-        });
-        try{
-          Promise.resolve(webpush.sendNotification(suscription,payload));
-        }catch(error){
-          console.log(error);
-        }    
-      })
-    }
-    
+    await alert.save();
+    const db = database;
+    set(ref(db,'alerts/' + alert._id.toString()),{
+      "sender": req.user._id.toString(),
+      "name": req.user.name,
+      "address": req.user.address,
+      "username": req.user.username,
+      "createdAt": alert.createdAt.toString(),
+    });
     res.send('alerta guardada');    
   }else{
     res.send('user not logged still')
   }
 }
+// const postAlert = async (req,res) => {
+//   if(req.user){
+//     const alert = new Alert ({
+//       sender: req.user._id,
+//     });
+//     alert.save();
 
-export {postAlert, getMyAlertsInGroup};
+//     const myGroups = await Promise.resolve(UserGroup.find({user: req.user._id, blocked: false}));
+
+//     Promise.all(myGroups.map(async (userGroup) => {
+//       let alertInGroup = new AlertInGroup({
+//         group: userGroup.group,
+//         alert: alert._id
+//       });
+//       alertInGroup.save()
+//     }));
+    
+//     res.send('alerta guardada');    
+//   }else{
+//     res.send('user not logged still')
+//   }
+// }
+
+export {postAlert, getMyAlertsInGroup, getMyAlerts};

@@ -1,39 +1,58 @@
 import User from "../models/User.model.js";
-import passport from "passport";
+import asyncHandler from 'express-async-handler';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
-
-const postRegister = (req, res) => {
+const postRegister = asyncHandler(async(req, res) => {
   const {username, password, address, name} = req.body;
 
-  User.register({username: username, address: address, name:name}, password,function(err, user){
-    if(err){res.send(err)}
-    else
-    {res.send('registered');}
-  });
+  if(!username || !password || !address ||!name){
+    res.send('faltan datos')
+  }else{
+    const userExist = await User.findOne({username})
+    if(userExist){
+      res.send('ya esta registrado')
+    }else{
+      const salt = await bcrypt.genSalt(10)
+      const hashedPassword = await bcrypt.hash(password,salt)
+      const user = await User({
+        username: username,
+        name: name,
+        address: address,
+        password: hashedPassword
+      });
+      user.save()
+      res.json({
+      _id: user.id,
+      name: user.name,
+      username: user.username,
+      token: generateToken(user._id)
+      })   
+    }
+  }
   
-}
+})
 
-const postLogin = (req,res) =>{
+const postLogin = asyncHandler(async (req,res) =>{
     const {username, password} = req.body;
+    const user = await User.findOne({username})
+    if(user && (await bcrypt.compare(password,user.password))){
+      res.json({
+        _id: user._id,
+        name: user.name,
+        username: user.username,
+        address: user.address,
+        token: generateToken(user._id)
+      });
+    }else{
+      res.send('invalid credentials')
+    }
+})
 
-    const user = new User({
-      username: username,
-      password: password
-    });
-    req.login(user, function(err){
-      if(err){console.log(err)}else{
-        passport.authenticate('local', { failureRedirect: '/error' })(req,res, function(){            
-            res.send('logged');
-        });
-      }
-    });
+const generateToken = (id) =>{
+  return jwt.sign({id},process.env.JWT_SECRET,{
+      expiresIn:'30d'
+  })
 }
 
-const getLogout = async (req,res) =>{
-  await req.logout(function(err) {
-    if (err) { return next(err); }
-    res.send('outlogged');
-  });
-}
-
-export {postLogin, getLogout, postRegister};
+export {postLogin, postRegister};

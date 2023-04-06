@@ -6,17 +6,12 @@ import mongoose from "mongoose";
 import express from "express";
 import cors from 'cors';
 import bodyParser from "body-parser";
-import webpush from 'web-push';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
-import {getMyAlertsInGroup, postAlert } from "./controllers/alert.controller.js";
-import { getCurrentUser, getUser} from "./controllers/user.controller.js";
-import session from 'express-session';
-import passport from 'passport';
-import User from "./models/User.model.js";
-import { getLogout, postLogin, postRegister } from "./controllers/login.controller.js";
+import {getMyAlerts, getMyAlertsInGroup, postAlert } from "./controllers/alert.controller.js";
+import { getCurrentUser, getUser, protect} from "./controllers/user.controller.js";
+import { postLogin, postRegister } from "./controllers/login.controller.js";
 import { getMyGroup, getMyGroups, postBlockUserInGroup, postDeleteGroup, postGroup, postJoinGroup, postRenameGroup, postSetAdmin } from "./controllers/group.controller.js";
-import Suscription from './models/Suscription.model.js';
 
 const options = {
   definition: {
@@ -32,14 +27,6 @@ const options = {
 
 const app = express();
 
-app.use(session({
-  secret: 'Our little secret',
-  resave: false,
-  saveUninitialized: false
-}));
-app.use(passport.initialize());
-app.use(passport.session());
-
 const specs = swaggerJsdoc(options);
 app.use(
   "/api-docs",
@@ -51,12 +38,6 @@ mongoose.set('strictQuery',false);
 //mongoose.connect('mongodb://localhost:27017/alertaDB',{useNewUrlParser:true});
 mongoose.connect(process.env.MONGODB,{useNewUrlParser:true});
 
-passport.use(User.createStrategy());
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
-
-
-
 app.use(cors());
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -66,32 +47,21 @@ app.use(bodyParser.json());
 app.use(express.static('public'));
 app.set('view engine', 'ejs');
 
-webpush.setVapidDetails("mailto:test@test.com", process.env.PUBLICKEY, process.env.PRIVATEKEY);
 
-app.get('/', function(req,res){res.render('index')})
+// app.get('/', function(req,res){res.render('index')})
 
-app.post('/subscription', async (req, res) => {
-  let pushSubscription = req.body;
-  const result = await Suscription.findOne({keys: pushSubscription.keys});
-  if(result){
-    console.log('ya estabas suscrito')
-  }else{
-    let suscription = new Suscription(pushSubscription);  
-    await suscription.save();    
-  }
-})
 
 app.get('/error', function(req,res){res.send('error de login');});
 
 /** 
  * @swagger
- * /currentUser:
+ * /user:
  *   get:
  *     tags:
  *     - Login
  *     summary: Get user logged 
 */
-app.get('/currentUser', getCurrentUser);
+app.get('/user', protect, getCurrentUser);
 /** 
  * @swagger
  * /login:
@@ -128,16 +98,6 @@ app.post('/login', postLogin);
  *        description: User name
 */
 app.post('/register', postRegister);
-/** 
- * @swagger
- * /logout:
- *   get:
- *     tags:
- *     - Login
- *     summary: Close user session
-*/
-app.get('/logout', getLogout);
-
 
 /** 
  * @swagger
@@ -151,7 +111,7 @@ app.get('/logout', getLogout);
  *        name: groupName
  *        description: Group name
 */
-app.post('/groups/new', postGroup);
+app.post('/groups/new', protect, postGroup);
 /** 
  * @swagger
  * /groups/join:
@@ -164,7 +124,7 @@ app.post('/groups/new', postGroup);
  *        name: code
  *        description: groupID
 */
-app.post('/groups/join',postJoinGroup);
+app.post('/groups/join',protect, postJoinGroup);
 /** 
  * @swagger
  * /groups/myGroups:
@@ -173,7 +133,7 @@ app.post('/groups/join',postJoinGroup);
  *     - Groups
  *     summary: Get groupID, groupName, number of integrants, myStatus by each Group 
 */
-app.get('/groups/myGroups', getMyGroups);
+app.get('/groups/myGroups', protect, getMyGroups);
 /** 
  * @swagger
  * /groups/myGroup/:id:
@@ -186,7 +146,7 @@ app.get('/groups/myGroups', getMyGroups);
  *        name: id
  *        description: groupID
 */
-app.get('/groups/myGroup/:id', getMyGroup);
+app.get('/groups/myGroup/:id', protect, getMyGroup);
 /** 
  * @swagger
  * /user/:id:
@@ -217,7 +177,7 @@ app.get('/user/:id', getUser);
  *        name: group
  *        description: groupID
 */
-app.post('/groups/blockUser', postBlockUserInGroup);
+app.post('/groups/blockUser', protect, postBlockUserInGroup);
 /** 
  * @swagger
  * /groups/delete:
@@ -230,7 +190,7 @@ app.post('/groups/blockUser', postBlockUserInGroup);
  *        name: id
  *        description: groupID
 */
-app.post('/groups/delete', postDeleteGroup);
+app.post('/groups/delete', protect, postDeleteGroup);
 /** 
  * @swagger
  * /groups/rename:
@@ -246,7 +206,7 @@ app.post('/groups/delete', postDeleteGroup);
  *        name: newname
  *        description: new Group name
 */
-app.post('/groups/rename', postRenameGroup);
+app.post('/groups/rename', protect, postRenameGroup);
 /** 
  * @swagger
  * /groups/setAdmin:
@@ -262,7 +222,7 @@ app.post('/groups/rename', postRenameGroup);
  *        name: group
  *        description: groupID
 */
-app.post('/groups/setAdmin', postSetAdmin);
+app.post('/groups/setAdmin', protect, postSetAdmin);
 
 
 /** 
@@ -271,9 +231,9 @@ app.post('/groups/setAdmin', postSetAdmin);
  *   post:
  *     tags:
  *     - Alerts
- *     summary: Creates a new alert and sends it to all the groups the user has
+ *     summary: Creates a new alert and sends it to all
 */
-app.post('/alerts/new', postAlert);
+app.post('/alerts/new', protect, postAlert);
 
 /** 
  * @swagger
@@ -287,7 +247,22 @@ app.post('/alerts/new', postAlert);
  *        name: id
  *        description: groupID
 */
-app.get('/alerts/myGroup/:id', getMyAlertsInGroup);
+app.get('/alerts/myGroup/:id', protect, getMyAlertsInGroup);
+
+/** 
+ * @swagger
+ * /alerts/myGroup/:id:
+ *   post:
+ *     tags:
+ *     - Alerts
+ *     summary: Get sender, createdAt, _id, alert by each Alert
+ *     parameters:
+ *      - in: path
+ *        name: id
+ *        description: groupID
+*/
+app.get('/alerts', protect, getMyAlerts);
+
 
 const port = process.env.PORT || 4000;
 app.listen(port, function(){
