@@ -21,10 +21,10 @@ const protect = asyncHandler(async(req,res,next)=>{
       req.user = await User.findById(decoded.id).select('-password')
       next();
     }catch(error){
-      res.json({message: "invalid token"})
+      res.status(400).send({ error: "invalid token" });
     }
     if(!token){
-      res.json({message: "no authorization no token"})	
+      res.status(400).send({ error: "no authorization no token" });
     }
   }
 })

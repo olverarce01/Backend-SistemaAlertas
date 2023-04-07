@@ -7,11 +7,17 @@ const postRegister = asyncHandler(async(req, res) => {
   const {username, password, address, name} = req.body;
 
   if(!username || !password || !address ||!name){
-    res.json({message: "faltan datos"})
+    let datosFaltantes = [];
+    if(!username){datosFaltantes.push('username')}
+    if(!password){datosFaltantes.push('password')}
+    if(!address){datosFaltantes.push('address')}
+    if(!name){datosFaltantes.push('name')}
+
+    res.status(400).send({ error: "faltan datos", datosFaltantes: datosFaltantes});
   }else{
     const userExist = await User.findOne({username})
     if(userExist){
-      res.json({message: "ya esta registrado"})
+      res.status(400).send({ error: "ya esta registrado" });
     }else{
       const salt = await bcrypt.genSalt(10)
       const hashedPassword = await bcrypt.hash(password,salt)
@@ -45,7 +51,7 @@ const postLogin = asyncHandler(async (req,res) =>{
         token: generateToken(user._id)
       });
     }else{
-      res.json({message: "invalid credentials"})
+      res.status(400).send({ error: "invalid credentials" });
     }
 })
 

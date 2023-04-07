@@ -9,7 +9,7 @@ import mongoose from 'mongoose';
 
 const getMyAlerts = async (req,res)=>{
   if(!req.user){
-    res.json({message: "loggin first"})
+    res.status(400).send({ error: "loggin first" });
   }else{
     const alerts = await Alert.find({});
     res.json(alerts);
@@ -18,7 +18,7 @@ const getMyAlerts = async (req,res)=>{
 
 const getMyAlertsInGroup = async (req,res) =>{
   if(!req.user){
-    res.json({message: "loggin first"});
+    res.status(400).send({ error: "loggin first" });
   }else{
     const idGroup = new mongoose.Types.ObjectId(req.params.id);
 
@@ -71,7 +71,7 @@ const postAlert = async (req,res) => {
     });
     res.json({message: "alerta guardada"});    
   }else{
-    res.json({message: "user not logged still"})
+    res.status(400).send({ error: "user not logged still" });
   }
 }
 // const postAlert = async (req,res) => {

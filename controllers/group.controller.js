@@ -20,7 +20,7 @@ const postGroup = async (req,res) =>{
     
       res.json({message: "group saved"});      
     }else{
-      res.json({message: "group no saved"});
+      res.status(400).send({ error: "group no saved" });
     }
   } catch(err){
     res.json(err);
@@ -29,7 +29,7 @@ const postGroup = async (req,res) =>{
 
 const postJoinGroup = async (req, res) => {
   if(!req.user){
-    res.json({message: "loggin first"});
+    res.status(400).send({ error: "loggin first" });
   }else{
     const {code} = req.body;
     const group = await Promise.resolve(Group.findOne({_id:code}));
@@ -46,11 +46,10 @@ const postJoinGroup = async (req, res) => {
         userGroup.save();    
         res.json({message: "user added"});        
       }else{
-        res.json({message: "you are already in the group"})
-      }
-      
+        res.status(400).send({ error: "you are already in the group" });
+      }      
     }else{
-      res.json({message: "not found group"});
+      res.status(400).send({ error: "not found group" });
     }  
   }
 }
@@ -67,7 +66,7 @@ const getNumIntegrants = async (id) =>{
 
 const getMyGroups = async (req, res) => {
   if(!req.user){
-    res.json({message: "loggin first"});
+    res.status(400).send({ error: "loggin first" });    
   }else{
     const result = await UserGroup.aggregate(
       [
@@ -144,15 +143,15 @@ const postDeleteGroup = async (req,res) =>{
       if(results[0] && results[1] && results[2]){
         res.json({message: "deleted group"})
       }else{
-        res.json({message: "no deleted group"});
+        res.status(400).send({ error: "no deleted group" });    
       }
     }
     else{
-      res.json({message: "you are not admin"});
+      res.status(400).send({ error: "you are not admin" });    
     }
   
   }else{
-    res.json({message: "first loggin"});
+    res.status(400).send({ error: "first loggin" });    
   }
 }
 
@@ -167,13 +166,13 @@ const postRenameGroup = async (req, res) =>{
       if(result){
         res.json({message: "updated name"})
       }else{
-        res.json({message: "no updated name"})
+        res.status(400).send({ error: "no updated name" });    
       }
     }else{
-      res.json({message: "you are not admin"});
+      res.status(500).send({ error: "you are not admin" });    
     }
   }else{
-    res.json({message: "first loggin"})
+    res.status(500).send({ error: "first loggin" });    
   }
 }
 
@@ -187,13 +186,13 @@ const postBlockUserInGroup = async (req, res) => {
       if(result){
         res.json({message: "blocked user in this group"});
       }else{
-        res.json({message: "not blocked user in this group"});
+        res.status(500).send({ error: "not blocked user in this group" });    
       }    
     }else{
-      res.json({message: "you are not admin"});
+      res.status(500).send({ error: "you are not admin" });    
     }
   }else{
-    res.json({message: "first loggin"});
+    res.status(500).send({ error: "first loggin" });    
   }
 
 }
@@ -207,13 +206,13 @@ const postSetAdmin = async(req, res) => {
       if(result){
         res.json({message: "user is admin now"});
       }else{
-        res.json({message: "user is not admin still"});
+        res.status(500).send({ error: "user is not admin still" });    
       }
     }else{
-      res.json({message: "you are not admin"});
+      res.status(500).send({ error: "you are not admin" });    
     }
   } else{
-    res.json({message: "first loggin"});
+    res.status(500).send({ error: "first loggin" });    
   } 
 }
 
