@@ -9,16 +9,16 @@ import mongoose from 'mongoose';
 
 const getMyAlerts = async (req,res)=>{
   if(!req.user){
-    res.send('loggin first')
+    res.json({message: "loggin first"})
   }else{
     const alerts = await Alert.find({});
-    res.send(alerts);
+    res.json(alerts);
   }
 };
 
 const getMyAlertsInGroup = async (req,res) =>{
   if(!req.user){
-    res.send('loggin first');
+    res.json({message: "loggin first"});
   }else{
     const idGroup = new mongoose.Types.ObjectId(req.params.id);
 
@@ -42,15 +42,15 @@ const getMyAlertsInGroup = async (req,res) =>{
         const sender = await User.findOne({_id:alert.dataAlert.sender});
         return {
           sender,
-          "_id ":alert._id,
-          "alert":alert.alert,
-          "createdAt":alert.dataAlert.createdAt,
-          "updatedAt":alert.dataAlert.updatedAt
+          _id :alert._id,
+          alert:alert.alert,
+          createdAt:alert.dataAlert.createdAt,
+          updatedAt:alert.dataAlert.updatedAt
         };
       }))
-      res.send(result);
+      res.json(result);
     }else{
-      res.send('not found alerts in group')
+      res.json({message: "not found alerts in group"})
     }
   }
 }
@@ -63,15 +63,15 @@ const postAlert = async (req,res) => {
     await alert.save();
     const db = database;
     set(ref(db,'alerts/' + alert._id.toString()),{
-      "sender": req.user._id.toString(),
-      "name": req.user.name,
-      "address": req.user.address,
-      "username": req.user.username,
-      "createdAt": alert.createdAt.toString(),
+      sender: req.user._id.toString(),
+      name: req.user.name,
+      address: req.user.address,
+      username: req.user.username,
+      createdAt: alert.createdAt.toString(),
     });
-    res.send('alerta guardada');    
+    res.json({message: "alerta guardada"});    
   }else{
-    res.send('user not logged still')
+    res.json({message: "user not logged still"})
   }
 }
 // const postAlert = async (req,res) => {

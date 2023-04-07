@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 
 const getUser = async (req, res) => {
   const user = await User.find({_id: req.params.id});
-  res.send(user);
+  res.json(user);
 }
 
 const getCurrentUser = async (req, res) => {
@@ -21,10 +21,10 @@ const protect = asyncHandler(async(req,res,next)=>{
       req.user = await User.findById(decoded.id).select('-password')
       next();
     }catch(error){
-      res.send('invalid token')
+      res.json({message: "invalid token"})
     }
     if(!token){
-      res.send('no authorization no token')	
+      res.json({message: "no authorization no token"})	
     }
   }
 })

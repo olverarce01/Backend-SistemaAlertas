@@ -18,18 +18,18 @@ const postGroup = async (req,res) =>{
       });
       userGroup.save();
     
-      res.send('group saved');      
+      res.json({message: "group saved"});      
     }else{
-      res.send('group no saved');
+      res.json({message: "group no saved"});
     }
   } catch(err){
-    res.send(err);
+    res.json(err);
   }
 }
 
 const postJoinGroup = async (req, res) => {
   if(!req.user){
-    res.send('loggin first');
+    res.json({message: "loggin first"});
   }else{
     const {code} = req.body;
     const group = await Promise.resolve(Group.findOne({_id:code}));
@@ -44,13 +44,13 @@ const postJoinGroup = async (req, res) => {
           admin: false
         });
         userGroup.save();    
-        res.send('user added');        
+        res.json({message: "user added"});        
       }else{
-        res.send('you are already in the group')
+        res.json({message: "you are already in the group"})
       }
       
     }else{
-      res.send('not found group');
+      res.json({message: "not found group"});
     }  
   }
 }
@@ -67,7 +67,7 @@ const getNumIntegrants = async (id) =>{
 
 const getMyGroups = async (req, res) => {
   if(!req.user){
-    res.send('loggin first');
+    res.json({message: "loggin first"});
   }else{
     const result = await UserGroup.aggregate(
       [
@@ -93,7 +93,7 @@ const getMyGroups = async (req, res) => {
         _id: userGroup.dataGroup._id
       };          
     }));
-    res.send(finalResult);  
+    res.json(finalResult);  
   }
 }
 
@@ -117,18 +117,18 @@ const getMyGroup = async (req, res) => {
   const results = await Promise.all([integrants,group]);
   
   const data = {
-    "integrants" : results[0].map(integrant =>{
-      return {"_id": integrant.dataUser[0]._id,
-              "admin": integrant.admin,
-              "blocked": integrant.blocked,
-              "name" : integrant.dataUser[0].name,
-              "address" : integrant.dataUser[0].address,
-              "username" : integrant.dataUser[0].username,
+    integrants : results[0].map(integrant =>{
+      return {_id: integrant.dataUser[0]._id,
+              admin: integrant.admin,
+              blocked: integrant.blocked,
+              name : integrant.dataUser[0].name,
+              address : integrant.dataUser[0].address,
+              username : integrant.dataUser[0].username,
             };
     }),
-    "groupName" : results[1]
+    groupName : results[1]
   }
-  res.send(data);
+  res.json(data);
 }
 
 const postDeleteGroup = async (req,res) =>{
@@ -142,17 +142,17 @@ const postDeleteGroup = async (req,res) =>{
       const deleteAlertGroup = AlertInGroup.deleteMany({group: id});
       const results = await Promise.all([deleteGroup,deleteUserGroup,deleteAlertGroup])
       if(results[0] && results[1] && results[2]){
-        res.send('deleted group')
+        res.json({message: "deleted group"})
       }else{
-        res.send('no deleted group');
+        res.json({message: "no deleted group"});
       }
     }
     else{
-      res.send('you are not admin');
+      res.json({message: "you are not admin"});
     }
   
   }else{
-    res.send('first loggin');
+    res.json({message: "first loggin"});
   }
 }
 
@@ -165,15 +165,15 @@ const postRenameGroup = async (req, res) =>{
     if(userGroup && userGroup.admin == true){
       const result = await Group.updateOne({_id: id},{groupName: newname});
       if(result){
-        res.send('updated name')
+        res.json({message: "updated name"})
       }else{
-        res.send('no updated name')
+        res.json({message: "no updated name"})
       }
     }else{
-      res.send('you are not admin');
+      res.json({message: "you are not admin"});
     }
   }else{
-    res.send('first loggin')
+    res.json({message: "first loggin"})
   }
 }
 
@@ -185,15 +185,15 @@ const postBlockUserInGroup = async (req, res) => {
     if(userGroup && userGroup.admin == true){
       const result = await UserGroup.updateOne({user: user, group: group},{blocked: true, admin: false});
       if(result){
-        res.send('blocked user in this group');
+        res.json({message: "blocked user in this group"});
       }else{
-        res.send('not blocked user in this group');
+        res.json({message: "not blocked user in this group"});
       }    
     }else{
-      res.send('you are not admin');
+      res.json({message: "you are not admin"});
     }
   }else{
-    res.send('first loggin');
+    res.json({message: "first loggin"});
   }
 
 }
@@ -205,15 +205,15 @@ const postSetAdmin = async(req, res) => {
     if(userGroup && userGroup.admin == true){
       const result = await UserGroup.updateOne({user: user, group: group},{admin: true});
       if(result){
-        res.send('user is admin now');
+        res.json({message: "user is admin now"});
       }else{
-        res.send('user is not admin still');
+        res.json({message: "user is not admin still"});
       }
     }else{
-      res.send('you are not admin');
+      res.json({message: "you are not admin"});
     }
   } else{
-    res.send('first loggin');
+    res.json({message: "first loggin"});
   } 
 }
 
