@@ -12,6 +12,7 @@ import {getMyAlerts, getMyAlertsInGroup, postAlert } from "./controllers/alert.c
 import { getCurrentUser, getUser, protect} from "./controllers/user.controller.js";
 import { postLogin, postRegister } from "./controllers/login.controller.js";
 import { getMyGroup, getMyGroups, postBlockUserInGroup, postDeleteGroup, postGroup, postJoinGroup, postRenameGroup, postSetAdmin } from "./controllers/group.controller.js";
+import { postSaveToken } from './controllers/notification.controller.js';
 
 const options = {
   definition: {
@@ -99,6 +100,8 @@ app.post('/login', postLogin);
  *        description: User name
 */
 app.post('/register', postRegister);
+
+app.post('/suscribe', postSaveToken);
 
 /** 
  * @swagger

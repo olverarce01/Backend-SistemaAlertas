@@ -5,15 +5,14 @@ import jwt from 'jsonwebtoken';
 import Token from "../models/Token.model.js";
 
 const postRegister = asyncHandler(async(req, res) => {
-  const {username, password, address, name, token} = req.body;
+  const {username, password, address, name} = req.body;
 
-  if(!username || !password || !address ||!name ||!token){
+  if(!username || !password || !address ||!name){
     let datosFaltantes = [];
     if(!username){datosFaltantes.push('username')}
     if(!password){datosFaltantes.push('password')}
     if(!address){datosFaltantes.push('address')}
     if(!name){datosFaltantes.push('name')}
-    if(!token){datosFaltantes.push('token')}
 
 
     res.status(400).send({ error: "faltan datos", datosFaltantes: datosFaltantes});
@@ -31,10 +30,6 @@ const postRegister = asyncHandler(async(req, res) => {
         password: hashedPassword
       });
       user.save();
-      let myToken = new Token({
-        token: token
-      })
-      myToken.save();
       
       res.json({
       _id: user.id,
