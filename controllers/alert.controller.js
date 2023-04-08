@@ -63,7 +63,7 @@ const postAlert = async (req,res) => {
 
     try {
       await admin.messaging().sendMulticast({
-        tokens:tokens,
+        tokens: [],
         notification:{
           sender,
           alert
