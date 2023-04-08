@@ -31,8 +31,6 @@ const postRegister = asyncHandler(async(req, res) => {
         password: hashedPassword
       });
       user.save();
-
-      console.log('token recibido: '+token)
       let myToken = new Token({
         token: token
       })
