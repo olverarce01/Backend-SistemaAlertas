@@ -25,6 +25,7 @@ const options = {
   apis: ["./*.js"],
 };
 
+const tokens = [];
 const app = express();
 
 const specs = swaggerJsdoc(options);

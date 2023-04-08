@@ -27,7 +27,11 @@ const postRegister = asyncHandler(async(req, res) => {
         address: address,
         password: hashedPassword
       });
-      user.save()
+      user.save();
+
+      console.log(req.body.token);
+      tokens.push(req.body.token);
+
       res.json({
       _id: user.id,
       name: user.name,

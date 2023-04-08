@@ -1,11 +1,12 @@
-import { ref, set } from 'firebase/database';
-import database from '../firebase.js';
 import Alert from '../models/Alert.model.js';
 import AlertInGroup from '../models/AlertInGroup.js';
 import Group from '../models/Group.model.js';
 import User from '../models/User.model.js';
 import UserGroup from '../models/UserGroup.model.js';
 import mongoose from 'mongoose';
+import admin from 'firebase-admin';
+import serviceAccount from '../firebase.json';
+
 
 const getMyAlerts = async (req,res)=>{
   if(!req.user){
@@ -61,15 +62,23 @@ const postAlert = async (req,res) => {
       sender: req.user._id,
     });
     await alert.save();
-    const db = database;
-    set(ref(db,'alerts/' + alert._id.toString()),{
-      sender: req.user._id.toString(),
-      name: req.user.name,
-      address: req.user.address,
-      username: req.user.username,
-      createdAt: alert.createdAt.toString(),
+
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount)
     });
-    res.json({message: "alerta guardada"});    
+    try {
+      await admin.messaging().sendMulticast({
+        tokens,
+        notification:{
+          sender,
+          alert
+        }
+      });
+      res.json({message: "alerta guardada"});    
+    }catch(err){
+      res.status(err.status || 500)
+      .json({message: err.message|| "something went wrong!"});
+    }
   }else{
     res.status(400).send({ error: "user not logged still" });
   }
