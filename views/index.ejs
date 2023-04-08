@@ -8,7 +8,6 @@
 </head>
 <body>
     <h1>Push Notification Using Firebase message</h1>
-    <button onclick="suscribe()">suscribe</button>
     <button onclick="login()">login</button>
     <button onclick="newAlert()">new alert</button>
     
@@ -59,26 +58,25 @@
     };
     initializeApp(firebaseConfig);
 
-    function suscribe(){
-        const messaging = getMessaging();
-        getToken(messaging,{ vapidKey: 'BMEnRaNdwU-Kzby58EmCmW-b96hylgYzDGpGcUhtxfRioszcGFgrNRj1_vB8dl4sOZ-JbKIIN4QqEnzTcUN2YzI' }).then((token) => {
-            
-            console.log(token);
-            fetch('https://backend-sistemaalertas-production.up.railway.app/suscribe', {
-            method: 'POST',
-            body: JSON.stringify({
-                token: token
-            }),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-            })
-            .then(response=>response.json())
-            .then(json=>console.log(json))
-            .catch(err=>console.log(err));
-        });
+    const messaging = getMessaging();
+    getToken(messaging,{ vapidKey: 'BMEnRaNdwU-Kzby58EmCmW-b96hylgYzDGpGcUhtxfRioszcGFgrNRj1_vB8dl4sOZ-JbKIIN4QqEnzTcUN2YzI' }).then((token) => {
+        
+        console.log(token);
+        fetch('https://backend-sistemaalertas-production.up.railway.app/suscribe', {
+        method: 'POST',
+        body: JSON.stringify({
+            token: token
+        }),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+        })
+        .then(response=>response.json())
+        .then(json=>console.log(json))
+        .catch(err=>console.log(err));
+    });
 
-    }
+    
     </script>
     
 </body>
