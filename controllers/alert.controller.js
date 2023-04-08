@@ -69,8 +69,7 @@ const postAlert = async (req,res) => {
       const result = await admin.messaging().sendMulticast({
         tokens: tokensArr,
         data: {
-          sender: alert.sender,
-          alert
+          alert: 'new alert',
         }
       });
       console.log("send multicast: "+result);
