@@ -3,7 +3,7 @@ import Token from "../models/Token.model.js";
 const postSaveToken = async (req, res) =>{
   const {token } = req.body;
 
-  const existToken = await Token.find({token: token});
+  const existToken = await Token.findOne({token: token});
   if(existToken){
     res.status(400).json({message: 'ya esta el token'});
   }else{
