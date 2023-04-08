@@ -67,7 +67,7 @@ const postAlert = async (req,res) => {
         type: "service_account",
         project_id: "vigilant-12535",
         private_key_id: process.env.Private_key_id,
-        private_key: process.env.Private_key ? process.env.private_key.replace(/\\n/gm, "\n"):undefined,
+        private_key: process.env.Private_key ? JSON.parse(process.env.Private_key) : undefined,
         client_email: "firebase-adminsdk-v6l96@vigilant-12535.iam.gserviceaccount.com",
         client_id: "106643052260083512683",
         auth_uri: "https://accounts.google.com/o/oauth2/auth",
