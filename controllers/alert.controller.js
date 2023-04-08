@@ -66,13 +66,14 @@ const postAlert = async (req,res) => {
 
     try {
       const tokensArr = tokens.map((token)=>{return token.token;})
-      await admin.messaging().sendMulticast({
+      const result = await admin.messaging().sendMulticast({
         tokens: tokensArr,
-        notification:{
+        data: {
           sender: alert.sender,
           alert
         }
       });
+      console.log("send multicast: "+result);
       res.json({message: "alerta guardada"});    
     }catch(err){
       res.status(err.status || 500)
