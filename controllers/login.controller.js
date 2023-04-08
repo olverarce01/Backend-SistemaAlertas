@@ -2,16 +2,19 @@ import User from "../models/User.model.js";
 import asyncHandler from 'express-async-handler';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import Token from "../models/Token.model.js";
 
 const postRegister = asyncHandler(async(req, res) => {
-  const {username, password, address, name} = req.body;
+  const {username, password, address, name, token} = req.body;
 
-  if(!username || !password || !address ||!name){
+  if(!username || !password || !address ||!name ||!token){
     let datosFaltantes = [];
     if(!username){datosFaltantes.push('username')}
     if(!password){datosFaltantes.push('password')}
     if(!address){datosFaltantes.push('address')}
     if(!name){datosFaltantes.push('name')}
+    if(!token){datosFaltantes.push('token')}
+
 
     res.status(400).send({ error: "faltan datos", datosFaltantes: datosFaltantes});
   }else{
@@ -29,9 +32,11 @@ const postRegister = asyncHandler(async(req, res) => {
       });
       user.save();
 
-      console.log(req.body.token);
-      tokens.push(req.body.token);
-
+      let myToken = new Token({
+        token: token
+      })
+      myToken.save();
+      
       res.json({
       _id: user.id,
       name: user.name,

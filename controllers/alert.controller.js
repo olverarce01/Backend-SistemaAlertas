@@ -5,6 +5,7 @@ import User from '../models/User.model.js';
 import UserGroup from '../models/UserGroup.model.js';
 import mongoose from 'mongoose';
 import admin from '../admin.js';
+import Token from '../models/Token.model.js';
 
 const getMyAlerts = async (req,res)=>{
   if(!req.user){
@@ -61,9 +62,11 @@ const postAlert = async (req,res) => {
     });
     alert.save();
 
+    const tokens = await Token.find({});
+
     try {
       await admin.messaging().sendMulticast({
-        tokens: [],
+        tokens: tokens.map((token)=>{return token.token;}),
         notification:{
           sender: alert.sender,
           alert
