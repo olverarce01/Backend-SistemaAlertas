@@ -7,11 +7,63 @@
     <title>Push Notification Using Web-Push</title>
 </head>
 <body>
-    <h1>Push Notification Using Web-Push</h1>
+    <h1>Push Notification Using Firebase message</h1>
     <h1 id="user"></h1>
     <h1 id="new"></h1>
-    <button>new alert</button>
-    <script src="./client.js"></script>
+    <button onclick="newAlert()">new alert</button>
+    
+    <script>
+        let tokenAuth = '';
+        function newAlert(){
+             console.log('click')
+            fetch('https://backend-sistemaalertas-production.up.railway.app/alerts/new',{
+                method: "POST",
+                headers: {
+                    Authorization: "Bearer " + tokenAuth.toString()
+                }
+            })
+            .then(response=>response.json())
+            .then(json=>console.log(json))
+            .catch(err=>console.log(err));
+        }
+    </script>
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js";
+    import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-messaging.js";
 
+    // Inicializa Firebase
+    var firebaseConfig = {
+    apiKey: "AIzaSyBmlMjnPJfjV-Syi9EnlCItv1YPGiVDYxM",
+    authDomain: "vigilant-12535.firebaseapp.com",
+    databaseURL: "https://vigilant-12535-default-rtdb.firebaseio.com",
+    projectId: "vigilant-12535",
+    storageBucket: "vigilant-12535.appspot.com",
+    messagingSenderId: "948931661447",
+    appId: "1:948931661447:web:57e681cfe3425dd5f6f222",
+    measurementId: "G-MQQNC35GBJ"
+    };
+    initializeApp(firebaseConfig);
+
+    // Solicita un token de registro
+    const messaging = getMessaging();
+    getToken(messaging,{ vapidKey: 'BMEnRaNdwU-Kzby58EmCmW-b96hylgYzDGpGcUhtxfRioszcGFgrNRj1_vB8dl4sOZ-JbKIIN4QqEnzTcUN2YzI' }).then((token) => {
+        
+        console.log(token);
+        fetch('https://backend-sistemaalertas-production.up.railway.app/login', {
+        method: 'POST',
+        body: JSON.stringify({
+            username: 'imtoken@gmail.com',
+            password: '12345'
+        }),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+        })
+        .then(response=>response.json())
+        .then(json=>{console.log(json); tokenAuth=json.token;})
+        .catch(err=>console.log(err));
+    });
+    </script>
+    
 </body>
 </html>

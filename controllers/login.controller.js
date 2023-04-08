@@ -32,6 +32,7 @@ const postRegister = asyncHandler(async(req, res) => {
       });
       user.save();
 
+      console.log('token recibido: '+token)
       let myToken = new Token({
         token: token
       })
