@@ -43,7 +43,7 @@
     </script>
     <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js";
-    import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-messaging.js";
+    import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-messaging.js";
 
     // Inicializa Firebase
     var firebaseConfig = {
@@ -75,7 +75,9 @@
         .then(json=>console.log(json))
         .catch(err=>console.log(err));
     });
-
+    onMessage(messaging, (payload) => {
+    console.log('Message received. ', payload);
+    });
     
     </script>
     
