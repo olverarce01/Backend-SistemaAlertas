@@ -66,7 +66,6 @@ const postAlert = async (req,res) => {
 
     try {
       const tokensArr = tokens.map((token)=>{return token.token;})
-      console.log(tokensArr);
       await admin.messaging().sendMulticast({
         tokens: tokensArr,
         notification:{
