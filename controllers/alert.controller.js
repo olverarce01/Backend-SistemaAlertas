@@ -6,6 +6,8 @@ import UserGroup from '../models/UserGroup.model.js';
 import mongoose from 'mongoose';
 import admin from '../admin.js';
 import Token from '../models/Token.model.js';
+import asyncHandler from 'express-async-handler';
+
 
 const getMyAlerts = async (req,res)=>{
   if(!req.user){
@@ -55,7 +57,7 @@ const getMyAlertsInGroup = async (req,res) =>{
   }
 }
 
-const postAlert = async (req,res) => {
+const postAlert = asyncHandler(async (req,res) => {
   if(req.user){
     const alert = new Alert ({
       sender: req.user._id,
@@ -81,7 +83,7 @@ const postAlert = async (req,res) => {
   }else{
     res.status(400).send({ error: "user not logged still" });
   }
-}
+})
 // const postAlert = async (req,res) => {
 //   if(req.user){
 //     const alert = new Alert ({
