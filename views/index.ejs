@@ -8,8 +8,8 @@
 </head>
 <body>
     <h1>Push Notification Using Firebase message</h1>
-    <h1 id="user"></h1>
-    <h1 id="new"></h1>
+    <button onclick="login()">login</button>
+
     <button onclick="newAlert()">new alert</button>
     
     <script>
@@ -24,6 +24,21 @@
             })
             .then(response=>response.json())
             .then(json=>console.log(json))
+            .catch(err=>console.log(err));
+        }
+        function login(){
+            fetch('https://backend-sistemaalertas-production.up.railway.app/login', {
+            method: 'POST',
+            body: JSON.stringify({
+                username: 'newnew@gmail.com',
+                password: '12345'
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+            })
+            .then(response=>response.json())
+            .then(json=>{console.log(json); tokenAuth=json.token;})
             .catch(err=>console.log(err));
         }
     </script>
@@ -49,11 +64,13 @@
     getToken(messaging,{ vapidKey: 'BMEnRaNdwU-Kzby58EmCmW-b96hylgYzDGpGcUhtxfRioszcGFgrNRj1_vB8dl4sOZ-JbKIIN4QqEnzTcUN2YzI' }).then((token) => {
         
         console.log(token);
-        fetch('https://backend-sistemaalertas-production.up.railway.app/login', {
+        fetch('https://backend-sistemaalertas-production.up.railway.app/register', {
         method: 'POST',
         body: JSON.stringify({
-            username: 'imtoken@gmail.com',
-            password: '12345'
+            username: 'newnew@gmail.com',
+            password: '12345',
+            address: 'linderos',
+            name: 'token'
         }),
         headers: {
             'Content-Type': 'application/json'
