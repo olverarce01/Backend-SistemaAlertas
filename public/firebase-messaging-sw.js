@@ -1,5 +1,9 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js";
-import { getMessaging, onMessage } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-messaging.js";
+// import { initializeApp } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js";
+// import { getMessaging, onMessage } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-messaging.js";
+
+importScripts('https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js');
+importScripts('https://www.gstatic.com/firebasejs/9.19.1/firebase-messaging.js');
+
 
 // Inicializa Firebase
 var firebaseConfig = {
@@ -12,15 +16,15 @@ messagingSenderId: "948931661447",
 appId: "1:948931661447:web:57e681cfe3425dd5f6f222",
 measurementId: "G-MQQNC35GBJ"
 };
-initializeApp(firebaseConfig);
+firebase.initializeApp(firebaseConfig);
 
-const messaging = getMessaging();
+const messaging = firebase.messaging();
 
-onMessage(messaging, (payload) => {
+messaging.onMessage((payload) => {
   console.log('Message received. ', payload);
 });
 
-onBackgroundMessage(messaging, (payload) => {
+messaging.onBackgroundMessage((payload) => {
   console.log('[firebase-messaging-sw.js] Received background message ', payload);
   // Customize notification here
   const notificationTitle = 'Background Message Title';
