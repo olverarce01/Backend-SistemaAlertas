@@ -1,9 +1,8 @@
 // import { initializeApp } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js";
 // import { getMessaging, onMessage } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-messaging.js";
 
-importScripts('https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js');
-importScripts('https://www.gstatic.com/firebasejs/9.19.1/firebase-messaging.js');
-
+importScripts('https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js');
+importScripts('https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js');
 
 // Inicializa Firebase
 var firebaseConfig = {
