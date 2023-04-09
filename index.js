@@ -50,7 +50,7 @@ app.use(express.static('public'));
 app.set('view engine', 'ejs');
 
 
-app.get('/', function(req,res){res.render('index')})
+// app.get('/', function(req,res){res.render('index')})
 
 
 app.get('/error', function(req,res){res.json({message: "error de login"});});
