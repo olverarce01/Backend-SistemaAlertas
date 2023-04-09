@@ -77,7 +77,7 @@
     });
     onMessage(messaging, (payload) => {
     console.log('Message received. ', payload);
-    const notification = new Notification(payload.title, { body: payload.body});
+    const notification = new Notification(payload.notification.title, { body: payload.notification.body});
     });
     
     </script>
