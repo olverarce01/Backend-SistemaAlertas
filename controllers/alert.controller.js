@@ -72,7 +72,7 @@ const postAlert = asyncHandler(async (req,res) => {
         body: 'alert'
       },
       data:{
-        messageID: alert._id,
+        messageID: alert._id.toString(),
         messageTimestamp: alert.createdAt.toString()
       }
     })
