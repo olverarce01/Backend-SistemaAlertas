@@ -68,8 +68,8 @@ const postAlert = asyncHandler(async (req,res) => {
     admin.messaging().sendMulticast({
       tokens: tokensArr,
       notification: {
-        title: 'new alert',
-        body: 'alert'
+        title: 'Nueva alerta de: '+req.user.name,
+        body: 'Su dirección es: '+req.user.address
       },
       data:{
         messageID: alert._id.toString(),
