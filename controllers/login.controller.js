@@ -2,7 +2,6 @@ import User from "../models/User.model.js";
 import asyncHandler from 'express-async-handler';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import Token from "../models/Token.model.js";
 
 const postRegister = asyncHandler(async(req, res) => {
   const {username, password, address, name} = req.body;
