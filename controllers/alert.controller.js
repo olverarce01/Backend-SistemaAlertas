@@ -66,20 +66,32 @@ const postAlert = asyncHandler(async (req,res) => {
 
     const tokens = await Token.find({});
 
-    try {
-      const tokensArr = tokens.map((token)=>{return token.token;})
-      const result = await admin.messaging().sendMulticast({
-        tokens: tokensArr,
-        data: {
-          alert: 'new alert',
-        }
-      });
-      console.log("send multicast: "+result);
-      res.json({message: "alerta guardada"});    
-    }catch(err){
-      res.status(err.status || 500)
-      .json({message: err.message|| "something went wrong!"});
-    }
+    const tokensArr = tokens.map((token)=>{return token.token;})
+    admin.messaging().sendMulticast({
+      tokens: tokensArr,
+      notification: {
+        title: 'new alert',
+        body: 'alert'
+      },
+      data:{
+        messageID: alert._id,
+        messageTimestamp: alert.createdAt.toString()
+      }
+    })
+    .then((response)=>{
+      console.log(JSON.stringify(response));
+      if(response.failureCount >0){
+        const failedTokens = [];
+        response.responses.forEach((resp, idx)=>{
+          if(!resp.success){
+            failedTokens.push(tokensArr[idx]);
+          }
+        });
+        console.log('list tokens failure: '+failedTokens);
+
+      }
+    })
+    res.json({message: "alerta guardada"});    
   }else{
     res.status(400).send({ error: "user not logged still" });
   }
