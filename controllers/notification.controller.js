@@ -1,17 +1,30 @@
-import Token from "../models/Token.model.js";
+import axios from 'axios';
+
 
 const postSaveToken = async (req, res) =>{
   const {token } = req.body;
 
-  const existToken = await Token.findOne({token: token});
+  const {data:existToken} = await axios({
+    method: 'get',
+    url: 'http://localhost:4001/tokens/one/'+token
+  })
+
   if(existToken){
     res.status(400).json({message: 'ya esta el token'});
   }else{
-    let myToken = new Token({
-      token: token
+
+    const {data:result} = await axios({
+      method: 'post',
+      url: 'http://localhost:4001/tokens/save',
+      data: {
+        token: token
+      }
     })
-    myToken.save();
-    res.status(200).json({message: 'token saved'});  
+    if(result){
+      res.status(200).json({message: 'token saved'});  
+    }else{
+      res.status(400).json({message: 'token not saved'});  
+    }
   }
 }
 export {postSaveToken};
