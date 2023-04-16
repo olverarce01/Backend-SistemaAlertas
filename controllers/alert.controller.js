@@ -12,7 +12,6 @@ const getMyAlerts = async (req,res)=>{
       method: 'get',
       url: middlewareUrl+'/alerts/',
     });
-    console.log(alerts);
     res.json(alerts);
   }
 };
