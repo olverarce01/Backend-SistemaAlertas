@@ -1,12 +1,12 @@
 import axios from 'axios';
-
+import middlewareUrl from '../middleware.js';
 
 const postSaveToken = async (req, res) =>{
   const {token } = req.body;
 
   const {data:existToken} = await axios({
     method: 'get',
-    url: 'http://localhost:4001/tokens/one/'+token
+    url: middlewareUrl+'/tokens/one/'+token
   })
 
   if(existToken){
@@ -15,7 +15,7 @@ const postSaveToken = async (req, res) =>{
 
     const {data:result} = await axios({
       method: 'post',
-      url: 'http://localhost:4001/tokens/save',
+      url: middlewareUrl+'/tokens/save',
       data: {
         token: token
       }

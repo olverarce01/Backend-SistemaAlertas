@@ -1,6 +1,7 @@
 import admin from '../admin.js';
 import asyncHandler from 'express-async-handler';
 import axios from 'axios';
+import middlewareUrl from '../middleware.js';
 
 const getMyAlerts = async (req,res)=>{
   if(!req.user){
@@ -9,7 +10,7 @@ const getMyAlerts = async (req,res)=>{
 
     const {data:alerts} = await axios({
       method: 'get',
-      url: 'http://localhost:4001/alerts/',
+      url: middlewareUrl+'/alerts/',
     });
     console.log(alerts);
     res.json(alerts);
@@ -20,7 +21,7 @@ const postAlert = asyncHandler(async (req,res) => {
   if(req.user){
     const {data:alert} = await axios({
       method: 'post',
-      url: 'http://localhost:4001/alerts/save',
+      url: middlewareUrl+'/alerts/save',
       data: {
         senderId: req.user._id
       }
@@ -28,7 +29,7 @@ const postAlert = asyncHandler(async (req,res) => {
 
     const {data:tokens} = await axios({
       method: 'get',
-      url: 'http://localhost:4001/tokens/'
+      url: middlewareUrl+'/tokens/'
     });
 
     const tokensArr = tokens.map((token)=>{return token.token;})

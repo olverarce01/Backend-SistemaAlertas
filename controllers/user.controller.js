@@ -1,12 +1,13 @@
 import asyncHandler from 'express-async-handler';
 import jwt from 'jsonwebtoken';
 import axios from 'axios';
+import middlewareUrl from '../middleware.js';
 
 const getUser = async (req, res) => {
 
   const {data:user} = await axios({
     method: 'post',
-    url: 'http://localhost:4001/users/one',
+    url: middlewareUrl+'/users/one',
     data: {
       id: req.params.id
     }
@@ -18,7 +19,7 @@ const getCurrentUser = async (req, res) => {
 
   const {data:user} = await axios({
     method: 'post',
-    url: 'http://localhost:4001/users/one',
+    url: middlewareUrl+'/users/one',
     data: {
       id: req.user._id
     }
@@ -36,7 +37,7 @@ const protect = asyncHandler(async(req,res,next)=>{
 
       const {data:reqUser} = await axios({
         method: 'post',
-        url: 'http://localhost:4001/users/byId',
+        url: middlewareUrl+'/users/byId',
         data: {
           id: decoded.id         
         }

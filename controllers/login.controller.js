@@ -2,6 +2,7 @@ import asyncHandler from 'express-async-handler';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import axios from 'axios';
+import middlewareUrl from '../middleware.js';
 const postRegister = asyncHandler(async(req, res) => {
   const {username, password, address, name} = req.body;
 
@@ -18,7 +19,7 @@ const postRegister = asyncHandler(async(req, res) => {
      const {data:userExist} = await axios(
       {
         method: 'post',
-        url: 'http://localhost:4001/users/one/byUsername',
+        url: middlewareUrl+'/users/one/byUsername',
         data: {
           username: username
         }
@@ -32,7 +33,7 @@ const postRegister = asyncHandler(async(req, res) => {
 
       const {data:user} = await axios({
         method: 'post',
-        url: 'http://localhost:4001/users/save',
+        url: middlewareUrl+'/users/save',
         data: {
           username: username,
           name: name,
@@ -56,7 +57,7 @@ const postLogin = asyncHandler(async (req,res) =>{
 
     const {data:user} = await axios({
       method: 'post',
-      url: 'http://localhost:4001/users/one/byUsername',
+      url: middlewareUrl+'/users/one/byUsername',
       data:{
         username: username,     
       }
