@@ -45,7 +45,8 @@ app.use(express.json());
  *   get:
  *     tags:
  *     - Login
- *     summary: Get user logged 
+ *     summary: Obtener datos de un usuario
+ *     description: Obtener datos de un usuario Logeado, como (username, name, address, password). Se necesita tener tokenJWT
 */
 app.get('/user', protect, getCurrentUser);
 /** 
@@ -54,7 +55,8 @@ app.get('/user', protect, getCurrentUser);
  *   post:
  *     tags:
  *     - Login
- *     summary: Authenticates a user
+ *     summary: Autentica un Usuario
+ *     description: Autentica y retorna datos del Usuario (_id, username, name, address, token), necesita de username y password
  *     parameters:
  *      - in: body
  *        name: username
@@ -69,7 +71,8 @@ app.post('/login', postLogin);
  *   post:
  *     tags:
  *     - Login
- *     summary: Register a user
+ *     summary: Registra un Usuario
+ *     description: Registra y devuelve los datos del Usuario (_id, username, name, token), necesita de username, password, address y address
  *     parameters:
  *      - in: body
  *        name: username
@@ -84,14 +87,28 @@ app.post('/login', postLogin);
  *        description: User name
 */
 app.post('/register', postRegister);
+/** 
+ * @swagger
+ * /register:
+ *   post:
+ *     tags:
+ *     - Login
+ *     summary: Guarda el token del Usuario
+ *     description: Guarda token para recibir notificaciones
+ *     parameters:
+ *      - in: body
+ *        name: token
+ *        description: token de Firebase
+*/
 app.post('/suscribe', postSaveToken);
 /** 
  * @swagger
  * /user/:id:
  *   get:
  *     tags:
- *     - Groups
- *     summary: Get a User
+ *     - Login
+ *     summary: Obtener un Usuario por el id
+ *     description: Obtener un Usuario y retorna (_id, username, name, address, password, address)
  *     parameters:
  *      - in: path
  *        name: id
@@ -104,7 +121,8 @@ app.get('/user/:id', getUser);
  *   post:
  *     tags:
  *     - Alerts
- *     summary: Creates a new alert and sends it to all
+ *     summary: Crea una alerta y la envia a todos los Usuarios
+ *     description: Crea una alerta y se conecta con la Firebase para enviar a cada token. Se necesita tener tokenJWT.
 */
 app.post('/alerts/new', protect, postAlert);
 /** 
@@ -113,11 +131,8 @@ app.post('/alerts/new', protect, postAlert);
  *   post:
  *     tags:
  *     - Alerts
- *     summary: Get sender, createdAt, _id, alert by each Alert
- *     parameters:
- *      - in: path
- *        name: id
- *        description: groupID
+ *     summary: Obtiene todas las alertas
+ *     description: Obtiene todas las alertas, cada una con (sender,createdAt,updateAt)
 */
 app.get('/alerts', protect, getMyAlerts);
 
