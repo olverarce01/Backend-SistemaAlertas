@@ -127,8 +127,8 @@ app.get('/user/:id', getUser);
 app.post('/alerts/new', protect, postAlert);
 /** 
  * @swagger
- * /alerts/myGroup/:id:
- *   post:
+ * /alerts:
+ *   get:
  *     tags:
  *     - Alerts
  *     summary: Obtiene todas las alertas
