@@ -89,7 +89,7 @@ app.post('/login', postLogin);
 app.post('/register', postRegister);
 /** 
  * @swagger
- * /register:
+ * /suscribe:
  *   post:
  *     tags:
  *     - Login
