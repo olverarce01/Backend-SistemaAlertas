@@ -32,6 +32,10 @@ const postAlert = asyncHandler(async (req,res) => {
     });
 
     const tokensArr = tokens.map((token)=>{return token.token;})
+    if(tokensArr.length == 0){
+      throw new Error('Any Token');
+
+    }
     admin.messaging().sendMulticast({
       tokens: tokensArr,
       notification: {
