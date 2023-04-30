@@ -8,7 +8,7 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import {getMyAlerts, postAlert } from "./controllers/alert.controller.js";
 import { getCurrentUser, getUser, protect} from "./controllers/user.controller.js";
-import { postLogin, postRegister } from "./controllers/login.controller.js";
+import {postRegister } from "./controllers/login.controller.js";
 import { postSaveToken } from './controllers/notification.controller.js';
 
 const options = {
@@ -49,22 +49,6 @@ app.use(express.json());
  *     description: Obtener datos de un usuario Logeado, como (username, name, address, password). Se necesita tener tokenJWT
 */
 app.get('/user', protect, getCurrentUser);
-/** 
- * @swagger
- * /login:
- *   post:
- *     tags:
- *     - Login
- *     summary: Autentica un Usuario
- *     description: Autentica y retorna datos del Usuario (_id, username, name, address, token), necesita de username y password
- *     parameters:
- *      - in: body
- *        name: username
- *        description: email
- *      - in: body
- *        name: password
-*/
-app.post('/login', postLogin);
 /** 
  * @swagger
  * /register:

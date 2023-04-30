@@ -1,6 +1,5 @@
 import asyncHandler from 'express-async-handler';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 import axios from 'axios';
 import middlewareUrl from '../middleware.js';
 const postRegister = asyncHandler(async(req, res) => {
@@ -41,45 +40,10 @@ const postRegister = asyncHandler(async(req, res) => {
           password: hashedPassword
         }
       })      
-      res.json({
-      _id: user.id,
-      name: user.name,
-      username: user.username,
-      token: generateToken(user._id)
-      })   
+      res.json({message: "usuario agregado"})   
     }
   }
   
 })
 
-const postLogin = asyncHandler(async (req,res) =>{
-    const {username, password} = req.body;
-
-    const {data:user} = await axios({
-      method: 'post',
-      url: middlewareUrl+'/users/one/byUsername',
-      data:{
-        username: username,     
-      }
-    })
-
-    if(user && (await bcrypt.compare(password,user.password))){
-      res.json({
-        _id: user._id,
-        name: user.name,
-        username: user.username,
-        address: user.address,
-        token: generateToken(user._id)
-      });
-    }else{
-      res.status(400).send({ error: "invalid credentials" });
-    }
-})
-
-const generateToken = (id) =>{
-  return jwt.sign({id},process.env.JWT_SECRET,{
-      expiresIn:'30d'
-  })
-}
-
-export {postLogin, postRegister};
+export {postRegister};
