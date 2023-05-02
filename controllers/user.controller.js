@@ -34,7 +34,6 @@ const protect = asyncHandler(async(req,res,next)=>{
       token = req.headers.authorization.split(' ')[1]
       const decoded = jwt.verify(token,process.env.JWT_SECRET_AUTHSERVER_API)
 
-
       const {data:reqUser} = await axios({
         method: 'post',
         url: middlewareUrl+'/users/byId',
@@ -42,9 +41,12 @@ const protect = asyncHandler(async(req,res,next)=>{
           id: decoded.id         
         }
       })      
-      req.user=reqUser;
-      
-      next();
+      if(reqUser){
+        req.user=reqUser;      
+        next();  
+      }else{
+        res.status(400).send({ error: "invalid token" });
+      }
     }catch(error){
       res.status(400).send({ error: "invalid token" });
     }

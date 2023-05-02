@@ -10,6 +10,8 @@ import {getMyAlerts, postAlert } from "./controllers/alert.controller.js";
 import { getCurrentUser, getUser, protect} from "./controllers/user.controller.js";
 import {postRegister } from "./controllers/login.controller.js";
 import { postSaveToken } from './controllers/notification.controller.js';
+import validateCreate from './validators/user.js';
+
 
 const options = {
   definition: {
@@ -70,7 +72,7 @@ app.get('/user', protect, getCurrentUser);
  *        name: name
  *        description: User name
 */
-app.post('/register', postRegister);
+app.post('/register', validateCreate, postRegister);
 /** 
  * @swagger
  * /suscribe:
